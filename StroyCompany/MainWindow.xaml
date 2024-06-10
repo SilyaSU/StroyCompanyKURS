@@ -1,0 +1,45 @@
+﻿<Window x:Class="StroyCompany.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <TabControl Name="mainTabControl">
+            <TabItem Header="Все объекты">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Name="allObjectsDataGrid" AutoGenerateColumns="True" Margin="10" Grid.Row="0" ColumnWidth="*"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10" Grid.Row="1">
+                        <Button Name="addButton" Content="Добавить" Width="100" Margin="0,5,10,5" Click="AddButton_Click"/>
+                        <Button Name="editButton" Content="Изменить" Width="100" Margin="0,5,10,5" Click="EditButton_Click"/>
+                        <Button Name="deleteButton" Content="Удалить" Width="100" Margin="0,5,0,5" Click="DeleteButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Объекты пользователя">
+                <Grid>
+                    <DataGrid Name="userObjectsDataGrid" AutoGenerateColumns="True" Margin="10" ColumnWidth="*"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Выбор таблицы">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ComboBox Name="tablesComboBox" SelectionChanged="TablesComboBox_SelectionChanged" Margin="10, 10, 545, 0" Width="220"/>
+                    <DataGrid Name="selectedTableDataGrid" AutoGenerateColumns="True" Margin="10" Grid.Row="1" ColumnWidth="*"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10" Grid.Row="2">
+                        <Button Content="Добавить" Width="100" Margin="0,5,10,5" Click="AddTableButton_Click"/>
+                        <Button Content="Удалить" Width="100" Margin="0,5,0,5" Click="DeleteTableButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
