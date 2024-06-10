@@ -19,8 +19,68 @@ namespace StroyCompany
             LoadAllObjects();
             LoadUserObjects(currentUserId);
             LoadTablesList();
+            LoadWorkSchedule();
             Loaded += MainWindow_Loaded;
+            workScheduleDataGrid.CellEditEnding += WorkScheduleDataGrid_CellEditEnding;
         }
+
+        private void WorkScheduleDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.Column.GetCellContent(e.Row) is CheckBox checkBox)
+            {
+                DataRowView rowView = e.Row.Item as DataRowView;
+
+                if (rowView != null)
+                {
+                    DataRow row = rowView.Row;
+
+                    Console.WriteLine("Row Columns:");
+                    foreach (DataColumn column in row.Table.Columns)
+                    {
+                        Console.WriteLine(column.ColumnName);
+                    }
+
+                    if (row.Table.Columns.Contains("id_График_работ"))
+                    {
+                        int workScheduleId = Convert.ToInt32(row["id_График_работ"]);
+                        bool isCompleted = checkBox.IsChecked == true;
+
+                        UpdateTaskCompletionStatus(workScheduleId, isCompleted);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не удалось найти колонку id_График_работ.");
+                    }
+                }
+            }
+        }
+
+
+
+
+        private void UpdateTaskCompletionStatus(int workScheduleId, bool isCompleted)
+        {
+            using (var db = new DataBase())
+            {
+                db.openConnection();
+                string query = "UPDATE График_работ SET Выполнено = @isCompleted WHERE id_График_работ = @workScheduleId";
+                using (SqlCommand cmd = new SqlCommand(query, db.sqlConnection))
+                {
+                    cmd.Parameters.AddWithValue("@isCompleted", isCompleted);
+                    cmd.Parameters.AddWithValue("@workScheduleId", workScheduleId);
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (SqlException ex)
+                    {
+                        MessageBox.Show("Ошибка при обновлении статуса выполнения задачи: " + ex.Message);
+                    }
+                }
+                db.closeConnection();
+            }
+        }
+
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -29,6 +89,7 @@ namespace StroyCompany
                 addButton.Visibility = Visibility.Collapsed;
                 editButton.Visibility = Visibility.Collapsed;
                 deleteButton.Visibility = Visibility.Collapsed;
+                mainTabControl.Items.RemoveAt(2);
                 mainTabControl.Items.RemoveAt(2);
             }
         }
@@ -296,7 +357,34 @@ namespace StroyCompany
             return columns;
         }
 
+        private void LoadWorkSchedule()
+        {
+            using (var db = new DataBase())
+            {
+                db.openConnection();
 
+                string query = @"
+                SELECT 
+                    График_работ.id_График_работ AS [id_График_работ],
+                    График_работ.Дата_начала AS [Дата начала],
+                    Объект.Название AS [Название объекта],
+                    Планы_и_чертежи.Описание AS [Описание чертежа],
+                    Рабочая_группа.Название AS [Название рабочей группы],
+                    График_работ.Выполнено AS [Выполнено]
+                FROM График_работ
+                LEFT JOIN Рабочая_группа ON График_работ.FK_Отдел_строительства = Рабочая_группа.id_Рабочая_группа
+                LEFT JOIN Объект ON Объект.FK_Рабочая_группа = Рабочая_группа.id_Рабочая_группа
+                LEFT JOIN Чертежи_обьекта ON Чертежи_обьекта.FK_Объект = Объект.id_Объект
+                LEFT JOIN Планы_и_чертежи ON Чертежи_обьекта.FK_Планы_и_чертежи = Планы_и_чертежи.id_Планы_и_чертежи";
+
+                SqlCommand cmd = new SqlCommand(query, db.sqlConnection);
+                SqlDataReader reader = cmd.ExecuteReader();
+                DataTable dataTable = new DataTable();
+                dataTable.Load(reader);
+                workScheduleDataGrid.ItemsSource = dataTable.DefaultView;
+                db.closeConnection();
+            }
+        }
 
 
 

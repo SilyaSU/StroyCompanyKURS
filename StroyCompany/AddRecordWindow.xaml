@@ -1,7 +1,7 @@
 ﻿<Window x:Class="StroyCompany.AddRecordWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Добавить запись" Height="300" Width="400">
+        Title="Добавить запись" Height="300" Width="400" Icon="/1645039647_50-fikiwiki-com-p-kartinki-seilor-mun-57.jpg">
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Name="inputStackPanel" Margin="10"/>
